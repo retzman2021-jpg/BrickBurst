@@ -1,0 +1,11 @@
+{
+  "watch": ["server.js", "middleware", "payments", "database"],
+  "ext": "js,json,env",
+  "ignore": ["node_modules", "public", "android", "ios", ".git"],
+  "exec": "node server.js",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 300,
+  "legacyWatch": true
+}

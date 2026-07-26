@@ -1,0 +1,16 @@
+{
+  "appId": "com.brickburst.ph",
+  "appName": "BrickBurst PH",
+  "webDir": "public",
+  "server": {
+    "url": "https://brickburst.onrender.com",
+    "cleartext": true
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "./brickburst.keystore",
+      "keystoreAlias": "brickburst",
+      "releaseType": "APK"
+    }
+  }
+}

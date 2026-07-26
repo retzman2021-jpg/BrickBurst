@@ -1,0 +1,4 @@
+@echo off
+cd "C:\Users\Ricky Apostol\Music\Brick Burst\BrickBurst"
+pm2 resurrect
+exit

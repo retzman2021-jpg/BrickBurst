@@ -1,0 +1,72 @@
+# ==============================================
+# 🚫 BRICKBURST — NEVER COMMIT THESE
+# ==============================================
+
+# 🔐 SECRETS (PAYMONGO / PAYPAL / JWT / ADMIN)
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.keystore
+*.jks
+brickburst.keystore
+
+# 📦 NODE / DEPS
+node_modules/
+package-lock.json.bak
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# 🗄️ LOCAL DATABASES
+*.db
+*.sqlite
+*.sqlite3
+database/*.json
+app.db
+
+# 🤖 CAPACITOR / ANDROID / IOS BUILDS
+android/
+ios/
+.capacitor/
+dist/
+build/
+output.json
+
+# 🛠️ EDITOR / OS JUNK
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# 📝 LOGS + CACHE
+logs/
+*.log
+*.tmp
+*.bak
+.cache/
+.temp/
+coverage/
+.parcel-cache/
+.eslintcache
+
+# 📱 AD / SDK CACHE
+.gradle/
+local.properties
+proguard/
+*.apk
+*.aab
+*.idsig
+
+# 🌐 RENDER / VERCEL / HOSTING
+.render/
+.vercel/
+.netlify/
+.firebase/

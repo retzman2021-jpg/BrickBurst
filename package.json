@@ -1,0 +1,44 @@
+{
+  "name": "brickburst",
+  "version": "2.0.0",
+  "description": "BrickBurst — Match-3 Adventure with KYC/AML, PayMongo + PayPal Payouts",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android",
+    "build:android": "npm run android:sync && npm run android:open"
+  },
+  "keywords": [
+    "brickburst",
+    "match3",
+    "earn",
+    "gcash",
+    "paymaya",
+    "paypal",
+    "aml",
+    "kyc",
+    "philippines"
+  ],
+  "author": "BrickBurst PH",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/cli": "^7.6.8",
+    "@capacitor/core": "^6.1.0",
+    "nodemon": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
