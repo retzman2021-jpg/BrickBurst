@@ -14,6 +14,7 @@ async function initDB() {
     db = new SQL.Database();
   }
 
+  // Create table only if missing
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -27,8 +28,13 @@ async function initDB() {
 }
 
 function saveDB() {
-  const data = db.export();
-  fs.writeFileSync(dbPath, Buffer.from(data));
+  try {
+    const data = db.export();
+    fs.writeFileSync(dbPath, Buffer.from(data));
+    console.log("✅ Database saved");
+  } catch (e) {
+    console.error("❌ Save failed:", e.message);
+  }
 }
 
 module.exports = { initDB, db, saveDB };

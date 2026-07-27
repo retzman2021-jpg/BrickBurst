@@ -13,49 +13,58 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Start server only after DB loads
+// Start server only after DB is ready
 initDB().then(() => {
   app.listen(PORT, () => console.log(`✅ Running on port ${PORT}`));
 });
 
-// REGISTER
+// === REGISTER (fixed duplicate check) ===
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({error: "Fill all fields"});
     if (password.length < 6) return res.status(400).json({error: "Password min 6 chars"});
 
-    const hash = await bcrypt.hash(password, 10);
-
-    try {
-      db.run(`INSERT INTO users (username, password) VALUES (?,?)`, [username, hash]);
-      saveDB();
-      const token = jwt.sign({username}, JWT_SECRET, {expiresIn: '7d'});
-      res.json({token, user: {username, points: 0}});
-    } catch (e) {
+    // First check if username EXISTS already
+    const existing = db.exec(`SELECT username FROM users WHERE username = ?`, [username]);
+    if (existing.length > 0) {
       return res.status(400).json({error: "Username already taken"});
     }
-  } catch {
+
+    // Create new user
+    const hash = await bcrypt.hash(password, 10);
+    db.run(`INSERT INTO users (username, password) VALUES (?,?)`, [username, hash]);
+    saveDB(); // Critical: save immediately after insert
+
+    const token = jwt.sign({username}, JWT_SECRET, {expiresIn: '7d'});
+    res.json({token, user: {username, points: 0}});
+  } catch (e) {
+    console.error("Register error:", e);
     res.status(500).json({error: "Server error"});
   }
 });
 
-// LOGIN
+// === LOGIN (fixed query parsing) ===
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) return res.status(400).json({error: "Fill all fields"});
 
+    // sql.js returns an array of result sets
     const result = db.exec(`SELECT * FROM users WHERE username = ?`, [username]);
-    if (!result.length) return res.status(401).json({error: "User not found"});
+    if (!result.length || !result[0].values.length) {
+      return res.status(401).json({error: "User not found"});
+    }
 
+    // Get user data correctly
     const user = result[0].values[0];
     const ok = await bcrypt.compare(password, user[2]);
     if (!ok) return res.status(401).json({error: "Wrong password"});
 
     const token = jwt.sign({username}, JWT_SECRET, {expiresIn: '7d'});
     res.json({token, user: {username: user[1], points: user[3]}});
-  } catch {
+  } catch (e) {
+    console.error("Login error:", e);
     res.status(500).json({error: "Server error"});
   }
 });
