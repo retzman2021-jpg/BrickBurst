@@ -1,284 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#1e40af">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>BrickBurst — Adventure Master</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brick Burst</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ===== AUTH FORM BOX (MATCHES YOUR THIRD IMAGE) ===== -->
-<div class="auth-box">
-  <h1 class="brand">
-    <span style="color:#f97316">B</span>
-    <span style="color:#3b82f6">L</span>
-    <span style="color:#ef4444">O</span>
-    <span style="color:#eab308">C</span>
-    <span style="color:#8b5cf6">K</span>
-    <br>
-    <span style="color:#22d3ee">B</span>
-    <span style="color:#22d3ee">L</span>
-    <span style="color:#22d3ee">A</span>
-    <span style="color:#22d3ee">S</span>
-    <span style="color:#22d3ee">T</span>
-  </h1>
-  <p class="sub">ADVENTURE MASTER</p>
+  <!-- AUTH MODAL -->
+  <div id="authModal" class="authModal">
+    <div class="auth-box">
+      <h1>BRICK BURST</h1>
+      <p>Match blocks & earn rewards!</p>
 
-  <!-- ===== LOGIN FORM ===== -->
-  <div id="tab-login" class="tab-pane">
-    <div class="form-group">
-      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
-    </div>
-    <div class="form-group">
-      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
-    </div>
-    <button class="btn btn-blue" onclick="doLogin()">Login</button>
-    <button class="btn btn-green" onclick="switchTab('register')">Register</button>
-  </div>
-
-  <!-- ===== REGISTER FORM ===== -->
-  <div id="tab-register" class="tab-pane hidden">
-    <div class="form-group">
-      <input type="text" id="regUser" placeholder="Username" autocomplete="username">
-    </div>
-    <div class="form-group">
-      <input type="email" id="regEmail" placeholder="Email">
-    </div>
-    <div class="form-group">
-      <input type="tel" id="regPhone" placeholder="Mobile Number (09XXXXXXXXX)" maxlength="11">
-    </div>
-    <div class="form-group">
-      <input type="date" id="regBday">
-    </div>
-    <div class="form-group">
-      <input type="password" id="regPass" placeholder="Password (min 8 chars)">
-      <div id="passStrength" class="strength"></div>
-    </div>
-    <div class="form-group">
-      <input type="password" id="regConfirm" placeholder="Confirm Password">
-    </div>
-    <div class="form-group checkbox">
-      <input type="checkbox" id="regTerms">
-      <label for="regTerms">I agree to Terms, Privacy & AML Policy</label>
-    </div>
-    <button class="btn btn-green" onclick="doRegister()">Create Account</button>
-    <button class="btn btn-blue" onclick="switchTab('login')">Back to Login</button>
-  </div>
-</div>
-
-<!-- ADMIN LOGIN -->
-<div id="adminModal" class="modal hidden"><div class="modal-card">
-  <h3>🔒 Admin</h3>
-  <label>Admin PIN</label><input id="adminPin" type="password">
-  <button class="btn-login" onclick="adminLogin()">Enter</button>
-  <button class="btn-ghost" onclick="closeAdminLogin()">Back</button>
-</div></div>
-
-<!-- MENU -->
-<div id="menuScreen" class="screen hidden">
-  <div class="menu-wrap">
-    <h1 class="game-title">
-      <span style="color:#eab308">B</span><span style="color:#ef4444">R</span><span style="color:#22c55e">I</span><span style="color:#06b6d4">C</span><span style="color:#8b5cf6">K</span><br>
-      <span style="color:#f97316">B</span><span style="color:#ec4899">U</span><span style="color:#a855f7">R</span><span style="color:#14b8a6">S</span><span style="color:#38bdf8">T</span>
-    </h1>
-    <p class="tagline">ADVENTURE MASTER</p>
-    <div id="kycBanner" class="kyc-banner hidden"></div>
-    <div class="menu-buttons">
-      <button class="btn-adv" onclick="startAdventure()">⏳ Adventure (4:00)</button>
-      <button class="btn-cls" onclick="startClassic()">∞ Classic (Unlimited)</button>
-      <button class="btn-more" onclick="moreGames()">🎮 More Games</button>
-      <div class="row-2">
-        <button class="btn-kyc" onclick="openKYC()">🆔 KYC</button>
-        <button class="btn-profile" onclick="openProfile()">👤 Profile</button>
+      <div id="loginForm">
+        <input type="text" id="loginUser" placeholder="Username">
+        <input type="password" id="loginPass" placeholder="Password">
+        <button onclick="doLogin()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="show('registerForm');hide('loginForm');return false;">Register</a></p>
       </div>
-      <button class="btn-out" onclick="logout()">📖 Log Out</button>
-    </div>
-  </div>
-</div>
 
-<!-- GAME -->
-<div id="gameScreen" class="screen hidden">
-  <div class="hud">
-    <div class="hud-item">Points <b id="hudPoints">0</b></div>
-    <div class="hud-item">Cash <b id="hudCash">₱0.00</b></div>
-    <div class="hud-item">Time <b id="hudTime">∞</b></div>
-    <div class="hud-btns">
-      <button class="icon-btn" onclick="openSettings()">⚙️</button>
-      <button class="icon-btn" onclick="backToMenu()">←</button>
-    </div>
-  </div>
-  <div class="canvas-frame"><canvas id="gameCanvas" width="440" height="440"></canvas></div>
-  <div class="last-score" id="lastScore">0</div>
-  <div class="earn-row">
-    <button class="btn-convert" onclick="openConvert()">💜 Convert</button>
-    <button class="btn-withdraw" onclick="openWithdraw()">💚 Withdraw</button>
-  </div>
-  <button class="btn-ad" onclick="watchAd()">💻 Watch Ad · <b>+200</b></button>
-  <p class="ad-hint">Watch full video for bonus</p>
-  <div class="ad-banner"></div>
-</div>
-
-<!-- ✅ KYC — FULL NAME #1 WITH RED BORDERS (IMPOSSIBLE TO MISS) -->
-<div id="kycModal" class="modal hidden"><div class="modal-card wide">
-  <h3>🆔 KYC — Required to Withdraw</h3>
-  <p class="hint" style="color:#dc2626;font-weight:800;margin:4px 0">⚠️ FILL FROM TOP TO BOTTOM — #1 BELOW IS MANDATORY</p>
-  <div id="kycStatus" class="kyc-status"></div>
-
-  <div id="kycForm">
-    <!-- 🔴 FULL NAME — FIRST FIELD, BIG, RED -->
-    <label style="color:#dc2626;font-weight:900;font-size:17px;display:block;margin-top:6px">⚠️ 1. FULL NAME (First MI Last) * — FILL THIS FIRST</label>
-    <input id="kFull" placeholder="JUAN A. DELA CRUZ" autocomplete="name"
-      style="border:3px solid #dc2626;background:#fff7ed;font-weight:700;padding:14px 12px;font-size:17px;border-radius:10px">
-    <p class="hint" style="color:#dc2626;margin:2px 0 10px">❌ Skipping this = automatic rejection</p>
-
-    <div class="row-2">
-      <div><label>2. Date of Birth *</label><input id="kBday" type="date"></div>
-      <div><label>3. Mobile *</label><input id="kPhone" maxlength="11" placeholder="09XXXXXXXXX"></div>
-    </div>
-
-    <label>4. Complete Address (House / St / Brgy) *</label>
-    <input id="kAddr" placeholder="Purok 1, Barangay Disud">
-
-    <div class="row-2">
-      <div><label>5. City *</label><input id="kCity" placeholder="Sindangan"></div>
-      <div><label>6. Province *</label><input id="kProv" placeholder="Zamboanga del Norte"></div>
-    </div>
-
-    <div class="row-2">
-      <div><label>7. ZIP</label><input id="kZip" maxlength="4" placeholder="7112"></div>
-      <div><label>8. Occupation</label><input id="kOcc" placeholder="Freelancer / OFW / Student"></div>
-    </div>
-
-    <div class="row-2">
-      <div>
-        <label>9. Valid Government ID *</label>
-        <select id="kIdType" required>
-          <option value="">— SELECT YOUR ID —</option>
-          <option>PhilSys National ID (PSA)</option>
-          <option>UMID (SSS / GSIS)</option>
-          <option>SSS ID / UMID</option>
-          <option>GSIS eCard / UMID</option>
-          <option>Philippine Passport</option>
-          <option>Driver's License (LTO)</option>
-          <option>PRC ID (Professional)</option>
-          <option>Voter's ID / Voter's Certificate (COMELEC)</option>
-          <option>Postal ID (PHLPost)</option>
-          <option>NBI Clearance</option>
-          <option>Police Clearance</option>
-          <option>Barangay Clearance / Certificate</option>
-          <option>Senior Citizen ID</option>
-          <option>PWD ID</option>
-          <option>OFW ID (OWWA)</option>
-          <option>Seaman's Book / SIRV (MARINA)</option>
-          <option>ACR I-Card (for foreigners)</option>
-          <option>Other Government-issued ID</option>
-        </select>
+      <div id="registerForm" class="hidden">
+        <input type="text" id="regUser" placeholder="Username">
+        <input type="password" id="regPass" placeholder="Password (min 6)">
+        <input type="password" id="regConfirm" placeholder="Confirm Password">
+        <button onclick="doRegister()">Create Account</button>
+        <p>Already have an account? <a href="#" onclick="show('loginForm');hide('registerForm');return false;">Login</a></p>
       </div>
-      <div><label>10. ID Number *</label><input id="kIdNum" placeholder="ID number here"></div>
-    </div>
 
-    <label>11. Source of Funds *</label>
-    <select id="kSource" required>
-      <option value="">— Select —</option>
-      <option>Game earnings</option><option>Salary</option><option>Business / Freelance</option>
-      <option>OFW Remittance</option><option>Allowance</option><option>Investment</option>
-      <option>Pension</option><option>Other</option>
-    </select>
-
-    <label>12. ID Front Photo *</label>
-    <input type="file" id="kFront" accept="image/*" capture="environment" required>
-    <label>13. ID Back Photo</label>
-    <input type="file" id="kBack" accept="image/*" capture="environment">
-    <label>14. Selfie + ID + "BrickBurst KYC" paper</label>
-    <input type="file" id="kSelfie" accept="image/*" capture="user">
-
-    <label class="check"><input type="checkbox" id="kConsent" required> I confirm all true + AMLA RA 9160 + Data Privacy RA 10173 consent.</label>
-    <button class="btn-register" onclick="submitKyc()">✅ Submit KYC</button>
-  </div>
-  <button class="btn-ghost" onclick="closeKyc()">Close</button>
-</div></div>
-
-<!-- PROFILE -->
-<div id="profileModal" class="modal hidden"><div class="modal-card wide">
-  <h3>👤 Profile</h3>
-  <div id="profileBody" class="profile-body"></div>
-  <h4 style="margin-top:12px">📜 Transactions</h4>
-  <div id="txList" class="tx-list"></div>
-  <button class="btn-ghost" onclick="closeProfile()">Close</button>
-</div></div>
-
-<!-- CONVERT -->
-<div id="convertModal" class="modal hidden"><div class="modal-card">
-  <h3>💜 Points → Cash</h3>
-  <p class="hint">100 pts = ₱1 · Min 100 · x100 only</p>
-  <label>Amount</label><input id="cvAmount" type="number" min="100" step="100" placeholder="500">
-  <button class="btn-convert" onclick="doConvert()">✅ Convert</button>
-  <button class="btn-ghost" onclick="closeConvert()">Cancel</button>
-</div></div>
-
-<!-- WITHDRAW -->
-<div id="withdrawModal" class="modal hidden"><div class="modal-card wide">
-  <h3>💚 Withdraw</h3>
-  <div id="wdLimits" class="aml-box"></div>
-  <div class="row-2">
-    <div><label>Amount ₱ *</label><input id="wdAmount" type="number" min="100" step="100" placeholder="100"></div>
-    <div><label>Method *</label>
-      <select id="wdMethod">
-        <option value="gcash">GCash</option>
-        <option value="maya">Maya</option>
-        <option value="instapay">Instapay / Bank</option>
-        <option value="paypal">PayPal</option>
-      </select>
+      <div id="authStatus" class="status"></div>
     </div>
   </div>
-  <div class="row-2">
-    <div><label>Account # *</label><input id="wdAccount" placeholder="09XXXXXXXXX"></div>
-    <div><label>Account Name * (match KYC)</label><input id="wdName" placeholder="JUAN DELA CRUZ"></div>
-  </div>
-  <div id="paypalField" class="hidden"><label>PayPal Email *</label><input id="wdPaypalEmail" type="email"></div>
-  <label>Source (₱2k+)</label>
-  <select id="wdSource"><option>Game earnings</option><option>Ads</option><option>Bonus</option><option>Convert</option><option>Other</option></select>
-  <p class="aml-note">🛡️ AMLA RA 9160 screened</p>
-  <button class="btn-withdraw" onclick="doWithdraw()">✅ Send</button>
-  <button class="btn-ghost" onclick="closeWithdraw()">Cancel</button>
-</div></div>
 
-<!-- SETTINGS -->
-<div id="settingsModal" class="modal hidden"><div class="modal-card">
-  <h3>⚙️ Settings</h3>
-  <div class="toggle-row"><span>🔊 SFX</span><input type="checkbox" id="sfxOn" checked onchange="saveSettings()"></div>
-  <label>SFX Volume</label><input type="range" id="sfxVol" min="0" max="100" value="100" oninput="saveSettings()">
-  <div class="toggle-row"><span>🎵 Music</span><input type="checkbox" id="bgmOn" checked onchange="saveSettings()"></div>
-  <label>Music Volume</label><input type="range" id="bgmVol" min="0" max="100" value="100" oninput="saveSettings()">
-  <div class="row-2">
-    <button class="btn-more" onclick="backToMenu()">🏠 Menu</button>
-    <button class="btn-adv" onclick="restartGame()">🔄 Restart</button>
+  <!-- MENU SCREEN -->
+  <div id="menuScreen" class="hidden">
+    <h1>MAIN MENU</h1>
+    <button onclick="show('gameScreen')">Start Game</button>
+    <button onclick="show('settingsScreen')">Settings</button>
   </div>
-  <button class="btn-ghost" onclick="closeSettings()">Close</button>
-</div></div>
 
-<!-- ADMIN SCREEN -->
-<div id="adminScreen" class="screen hidden">
-  <div class="admin-wrap">
-    <div class="admin-head"><h2>🛡️ Admin</h2><button class="btn-out small" onclick="adminLogout()">Logout</button></div>
-    <div class="stats-grid">
-      <div class="stat-card"><b id="aUsers">0</b><span>Users</span></div>
-      <div class="stat-card"><b id="aVer">0</b><span>Verified</span></div>
-      <div class="stat-card"><b id="aKyc">0</b><span>Pending</span></div>
-      <div class="stat-card"><b id="aVol">0</b><span>Volume</span></div>
-    </div>
-    <h3>🆔 KYC Queue</h3><div id="aKycList" class="admin-list"></div>
-    <h3>📜 Transactions</h3><div id="aTxList" class="admin-list"></div>
-    <h3>👥 Users</h3><div id="aUserList" class="admin-list"></div>
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="hidden">
+    <h2>Game Area</h2>
+    <div id="gameGrid"></div>
+    <button onclick="show('menuScreen')">Back</button>
   </div>
-</div>
 
-<!-- ✅ CACHE BUSTER v=6 — FORCES NEW FILES -->
-<script src="game.js?v=6"></script>
-<script src="app.js?v=6"></script>
+  <!-- SETTINGS SCREEN -->
+  <div id="settingsScreen" class="hidden">
+    <h2>Settings</h2>
+    <button onclick="show('menuScreen')">Back</button>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
-<!-- ✅ END index.html -->
