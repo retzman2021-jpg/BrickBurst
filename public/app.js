@@ -123,47 +123,42 @@ async function refreshHud(){
 window.refreshHud=refreshHud;window.refreshUserData=refreshHud;
 
 // ✅ FIXED LOGIN — NO STUCK, FORCE GO TO MENU
-async function doLogin(){
-  if(_loginLock)return;_loginLock=true;
-  const btn=document.querySelector(".btn-blue");
-  const origText=btn?.innerText||"Login";
-  if(btn){btn.disabled=true;btn.innerText="⏳ Logging in…";}
+async function doLogin() {
+  const username = document.getElementById("loginUser")?.value.trim();
+  const password = document.getElementById("loginPass")?.value.trim();
+  const status = document.getElementById("authStatus");
 
-  try{
-    const u=$("loginUser").value.trim().toLowerCase();
-    const pw=$("loginPass").value;
-    if(!u||!pw){alert("⚠️ Enter username + password");return;}
+  // Show error if fields are empty
+  if (!username || !password) {
+    if (status) status.textContent = "⚠️ Enter username and password";
+    return;
+  }
 
-    const r=await api("/login","POST",{username:u,password:pw});
-    _loginLock=false;
+  // Show loading state
+  if (status) status.textContent = "🔐 Logging in...";
 
-    if(!r.ok||!r.token){
-      alert(r.error||"❌ Check username/password");
-      return;
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      // Save login & go to game
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      if (status) status.textContent = "✅ Login successful!";
+      hideAuth();
+      show("gameScreen");
+    } else {
+      if (status) status.textContent = `❌ ${data.error || "Login failed"}`;
     }
-
-    setToken(r.token);
-    isAdmin=!!r.user?.isAdmin;
-    currentUser=r.user;
-    hideAuth();
-
-    if(isAdmin){loadAdmin();return;}
-
-    const fresh=await refreshHud();
-    if(r.dailyBonusGiven||r.bonusAdded){
-      const bonus=r.bonusAdded||100;
-      const newPts=Number(fresh?.points||currentUser?.points||0).toLocaleString();
-      alert(`✅ Welcome back!\n🎁 +${bonus} DAILY BONUS!\nPoints: ${newPts}`);
-    }else{
-      alert("✅ Login successful!");
-    }
-    showMenuBanner();
-    show("menuScreen"); // ✅ FORCE MENU
-  }catch(err){
-    _loginLock=false;
-    alert("❌ Error: "+err.message);
-  }finally{
-    if(btn){btn.disabled=false;btn.innerText=origText;}
+  } catch (err) {
+    console.error("Login error:", err);
+    if (status) status.textContent = "⚠️ Server error — try again later";
   }
 }
 
