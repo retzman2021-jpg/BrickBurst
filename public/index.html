@@ -10,42 +10,59 @@
 </head>
 <body>
 
-<!-- AUTH MODAL -->
-<div id="authModal" class="modal">
-  <div class="modal-card wide">
-    <div class="mini-title">
-      <span style="color:#eab308">B</span><span style="color:#ef4444">R</span><span style="color:#22c55e">I</span><span style="color:#06b6d4">C</span><span style="color:#8b5cf6">K</span><br>
-      <span style="color:#f97316">B</span><span style="color:#ec4899">U</span><span style="color:#a855f7">R</span><span style="color:#14b8a6">S</span><span style="color:#38bdf8">T</span>
-    </div>
-    <div class="tabs">
-      <button class="tab active" data-tab="login">Login</button>
-      <button class="tab" data-tab="register">Register</button>
-    </div>
-    <div id="tab-login" class="tab-pane">
-      <label>Username</label><input id="loginUser" autocomplete="username" placeholder="demo">
-      <label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="1234">
-      <button class="btn-login" onclick="doLogin()">🔐 Login</button>
-      <p class="hint">Demo: <b>demo / 1234</b></p>
-      <button class="btn-ghost tiny" onclick="openAdminLogin()">🔒 Admin</button>
-    </div>
-    <div id="tab-register" class="tab-pane hidden">
-      <div class="row-2">
-        <div><label>Username *</label><input id="regUser" placeholder="min 3"></div>
-        <div><label>Email *</label><input id="regEmail" type="email" placeholder="you@email.com"></div>
-      </div>
-      <div class="row-2">
-        <div><label>PH Mobile *</label><input id="regPhone" maxlength="11" placeholder="09123456789"></div>
-        <div><label>Birthday * (18+)</label><input id="regBday" type="date"></div>
-      </div>
-      <div class="row-2">
-        <div><label>Password *</label><input id="regPass" type="password" placeholder="8+ A-Z 0-9"></div>
-        <div><label>Confirm *</label><input id="regConfirm" type="password"></div>
-      </div>
-      <div id="passStrength" class="strength"></div>
-      <label class="check"><input type="checkbox" id="regTerms"> I am <b>18+</b>, agree to Terms + AMLA RA 9160 verification.</label>
-      <button class="btn-register" onclick="doRegister()">✅ Create Account (+₱300)</button>
-    </div>
+<!-- ===== AUTH TABS ===== -->
+<div class="auth-tabs">
+  <button class="tab active" data-tab="login">🔐 LOGIN</button>
+  <button class="tab" data-tab="register">📝 REGISTER</button>
+</div>
+
+<!-- ===== LOGIN FORM ===== -->
+<div id="tab-login" class="tab-pane">
+  <div class="form-group">
+    <label>Username</label>
+    <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
   </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+  </div>
+  <!-- ✅ ONLY ONE WORKING LOGIN BUTTON -->
+  <button class="btn btn-primary btn-login" onclick="doLogin()">🔐 LOGIN NOW</button>
+  <p class="hint">Press Enter key to submit</p>
+</div>
+
+<!-- ===== REGISTER FORM ===== -->
+<div id="tab-register" class="tab-pane hidden">
+  <div class="form-group">
+    <label>Username</label>
+    <input type="text" id="regUser" placeholder="Min 3 characters">
+  </div>
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" id="regEmail" placeholder="your@email.com">
+  </div>
+  <div class="form-group">
+    <label>Mobile Number</label>
+    <input type="tel" id="regPhone" placeholder="09XXXXXXXXX" maxlength="11">
+  </div>
+  <div class="form-group">
+    <label>Birthday</label>
+    <input type="date" id="regBday">
+  </div>
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" id="regPass" placeholder="Min 8 characters">
+    <div id="passStrength" class="strength"></div>
+  </div>
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <input type="password" id="regConfirm" placeholder="Re-type password">
+  </div>
+  <div class="form-group checkbox">
+    <input type="checkbox" id="regTerms">
+    <label for="regTerms">I agree to Terms, Privacy & AML Policy</label>
+  </div>
+  <button class="btn btn-primary" onclick="doRegister()">📝 CREATE ACCOUNT</button>
 </div>
 
 <!-- ADMIN LOGIN -->

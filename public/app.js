@@ -280,28 +280,58 @@ function openKYC(){
 function closeKyc(){$("kycModal").classList.add("hidden");}
 
 async function submitKyc(){
+  // 🔴 FIELD #1: FULL NAME — ALWAYS SCROLLS TO TOP
   const name=$("kFull").value.trim().toUpperCase();
   if(!name){
-    alert("❌ KYC NOT READY!\n\n👉 FULL NAME is the VERY FIRST FIELD at the TOP of the KYC form.\nIt has a THICK RED BORDER and says '⚠️ 1. FULL NAME'.\n\nScroll UP to the top and type your complete name (e.g. JUAN A. DELA CRUZ).");
-    $("kFull").focus();$("kFull").scrollIntoView({behavior:"smooth",block:"center"});return;
+    alert("❌ KYC NOT READY!\n\n👉 FULL NAME is the VERY FIRST FIELD at the TOP of this window.\nIt has a THICK RED BORDER labeled ⚠️ 1. FULL NAME.\n\nScroll UP to fill it in first.");
+    $("kFull").focus();
+    // ✅ FORCE SCROLL TO TOP + CENTER THE FIELD
+    $("kycModal").scrollTop = 0;
+    $("kFull").scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    return;
   }
   if(name.split(" ").filter(w=>w.length>1).length<2)return alert("❌ Enter FULL NAME: First + Last (e.g. JUAN DELA CRUZ)");
-  const bday=$("kBday").value;if(!bday)return alert("❌ 2. Enter Date of Birth");
-  if(Math.floor((Date.now()-new Date(bday))/31557600000)<18)return alert("❌ Must be 18+");
-  const phone=$("kPhone").value.trim();if(!/^09\d{9}$/.test(phone))return alert("❌ 3. Enter valid PH mobile (09XXXXXXXXX)");
-  const addr=$("kAddr").value.trim();if(!addr||addr.length<5)return alert("❌ 4. Enter Complete Address");
-  const city=$("kCity").value.trim();if(!city)return alert("❌ 5. Enter City");
-  const prov=$("kProv").value.trim();if(!prov)return alert("❌ 6. Enter Province");
-  const idType=$("kIdType").value;if(!idType)return alert("❌ 9. Select Valid Government ID");
-  const idNum=$("kIdNum").value.trim();if(!idNum)return alert("❌ 10. Enter ID Number");
-  const src=$("kSource").value;if(!src)return alert("❌ 11. Select Source of Funds");
-  if(!window.kFront_b64)return alert("📸 12. Upload FRONT ID photo");
-  if(!$("kConsent").checked)return alert("✅ Tick consent checkbox");
 
-  const b={fullName:name,birthday:bday,phone,address:addr,city,province,
+  const bday=$("kBday").value;
+  if(!bday){
+    alert("❌ 2. Enter Date of Birth");
+    $("kBday").focus();
+    $("kBday").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  const age=Math.floor((Date.now()-new Date(bday))/31557600000);
+  if(age<18)return alert("❌ Must be 18 years old or older");
+
+  const phone=$("kPhone").value.trim();
+  if(!/^09\d{9}$/.test(phone)){
+    alert("❌ 3. Enter valid PH mobile (09XXXXXXXXX)");
+    $("kPhone").focus();
+    $("kPhone").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+
+  const addr=$("kAddr").value.trim();
+  if(!addr||addr.length<5){
+    alert("❌ 4. Enter Complete Address");
+    $("kAddr").focus();
+    $("kAddr").scrollIntoView({ behavior: "smooth", block: "center" });
+    return;
+  }
+  const city=$("kCity").value.trim();if(!city){alert("❌ 5. Enter City");$("kCity").focus();$("kCity").scrollIntoView({behavior:"smooth",block:"center"});return;}
+  const prov=$("kProv").value.trim();if(!prov){alert("❌ 6. Enter Province");$("kProv").focus();$("kProv").scrollIntoView({behavior:"smooth",block:"center"});return;}
+
+  const idType=$("kIdType").value;if(!idType){alert("❌ 9. Select Valid Government ID");$("kIdType").focus();$("kIdType").scrollIntoView({behavior:"smooth",block:"center"});return;}
+  const idNum=$("kIdNum").value.trim();if(!idNum){alert("❌ 10. Enter ID Number");$("kIdNum").focus();$("kIdNum").scrollIntoView({behavior:"smooth",block:"center"});return;}
+  const src=$("kSource").value;if(!src){alert("❌ 11. Select Source of Funds");$("kSource").focus();$("kSource").scrollIntoView({behavior:"smooth",block:"center"});return;}
+  if(!window.kFront_b64){alert("📸 12. Upload FRONT photo of your ID");return;}
+  if(!$("kConsent").checked){alert("✅ Tick the consent checkbox at the bottom");return;}
+
+  const b={
+    fullName:name,birthday:bday,phone,address:addr,city,province,
     zip:$("kZip").value.trim(),occupation:$("kOcc").value.trim(),
     idType,idNumber:idNum,sourceOfFunds:src,
-    idFront:window.kFront_b64||"",idBack:window.kBack_b64||"",selfie:window.kSelfie_b64||""};
+    idFront:window.kFront_b64||"",idBack:window.kBack_b64||"",selfie:window.kSelfie_b64||""
+  };
   const r=await api("/kyc/submit","POST",b);if(!r.ok)return;
   alert(r.message||"✅ KYC Submitted!\nReview within 24 hours.");
   closeKyc();showMenuBanner();
