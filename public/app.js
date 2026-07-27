@@ -30,7 +30,7 @@ function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.ad
 function showAuth(){
   const m = document.getElementById("authModal");
   if(m){
-    m.classList.remove("hidden");
+    if(m) m.classList.remove("hidden");
     m.style.display = "flex";
   }
   show("menuScreen");
@@ -39,7 +39,7 @@ function showAuth(){
 function hideAuth(){
   const m = document.getElementById("authModal");
   if(m){
-    m.classList.add("hidden");
+    if(m) m.classList.add("hidden");
     m.style.display = "none";
   }
 }
