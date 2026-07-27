@@ -162,36 +162,52 @@ async function doLogin() {
   }
 }
 
-async function doRegister(){
-  const b={
-    username:$("regUser").value.trim().toLowerCase(),
-    email:$("regEmail").value.trim().toLowerCase(),
-    phone:$("regPhone").value.trim(),
-    birthday:$("regBday").value,
-    password:$("regPass").value,
-    confirm:$("regConfirm").value
-  };
-  if(!b.username||b.username.length<3)return alert("⚠️ Username min 3 letters");
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(b.email))return alert("⚠️ Valid email required");
-  if(!/^09\d{9}$/.test(b.phone))return alert("⚠️ Valid PH mobile (09XXXXXXXXX)");
-  if(!b.birthday)return alert("⚠️ Enter birthday");
-  if(Math.floor((Date.now()-new Date(b.birthday))/31557600000)<18)return alert("⚠️ Must be 18+");
-  if(b.password.length<8)return alert("⚠️ Password min 8 chars");
-  if(b.password!==b.confirm)return alert("⚠️ Passwords do not match");
-  if(!$("regTerms").checked)return alert("⚠️ Accept terms + AML consent");
+async function doRegister() {
+  const username = document.getElementById("regUser")?.value.trim();
+  const password = document.getElementById("regPass")?.value.trim();
+  const confirmPass = document.getElementById("regConfirm")?.value.trim();
+  const status = document.getElementById("authStatus");
 
-  const r=await api("/register","POST",b);
-  if(!r.ok)return;
+  // Basic validation
+  if (!username || !password || !confirmPass) {
+    if (status) status.textContent = "⚠️ Fill all fields";
+    return;
+  }
+  if (password !== confirmPass) {
+    if (status) status.textContent = "⚠️ Passwords do not match";
+    return;
+  }
+  if (password.length < 6) {
+    if (status) status.textContent = "⚠️ Password at least 6 characters";
+    return;
+  }
 
-  setToken(r.token);
-  currentUser=r.user;
-  hideAuth();
+  if (status) status.textContent = "📝 Creating account...";
 
-  const fresh=await refreshHud();
-  const bonus=r.welcomeBonus||r.bonusAdded||300;
-  const newPts=Number(fresh?.points||currentUser?.points||0).toLocaleString();
-  alert(`✅ Registered!\n🎁 +${bonus} WELCOME BONUS!\nPoints: ${newPts}\n👉 Submit KYC to withdraw.`);
-  showMenuBanner();
+  try {
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok && data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      if (status) status.textContent = "✅ Account created!";
+      setTimeout(() => {
+        hideAuth();
+        show("gameScreen");
+      }, 800);
+    } else {
+      if (status) status.textContent = `❌ ${data.error || "Registration failed"}`;
+    }
+  } catch (err) {
+    console.error("Register error:", err);
+    if (status) status.textContent = "⚠️ Server error — try again later";
+  }
 }
 
 function logout(){if(confirm("Logout?"))clearAuth();}
