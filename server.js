@@ -7,23 +7,23 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const JWT_SECRET = process.env.JWT_SECRET || 'brickburst_secure_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'brickburst_secure_2026';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Start server ONLY after DB is ready
+// Start server only after DB loads
 initDB().then(() => {
-  app.listen(PORT, () => console.log(`✅ Live on port ${PORT}`));
+  app.listen(PORT, () => console.log(`✅ Running on port ${PORT}`));
 });
 
-// === REGISTER ===
+// REGISTER
 app.post('/api/register', async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({error: 'Fill all fields'});
-    if (password.length < 6) return res.status(400).json({error: 'Password min 6 chars'});
+    if (!username || !password) return res.status(400).json({error: "Fill all fields"});
+    if (password.length < 6) return res.status(400).json({error: "Password min 6 chars"});
 
     const hash = await bcrypt.hash(password, 10);
 
@@ -31,31 +31,31 @@ app.post('/api/register', async (req, res) => {
       db.run(`INSERT INTO users (username, password) VALUES (?,?)`, [username, hash]);
       saveDB();
       const token = jwt.sign({username}, JWT_SECRET, {expiresIn: '7d'});
-      res.json({token, user: {username, points:0}});
+      res.json({token, user: {username, points: 0}});
     } catch (e) {
-      if (e.message.includes('UNIQUE')) return res.status(400).json({error: 'Username taken'});
-      res.status(500).json({error: 'Database error'});
+      return res.status(400).json({error: "Username already taken"});
     }
-  } catch (e) {
-    res.status(500).json({error: 'Server error'});
+  } catch {
+    res.status(500).json({error: "Server error"});
   }
 });
 
-// === LOGIN ===
+// LOGIN
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({error: 'Fill all fields'});
+    if (!username || !password) return res.status(400).json({error: "Fill all fields"});
 
-    const user = db.exec(`SELECT * FROM users WHERE username = ?`, [username])[0];
-    if (!user) return res.status(401).json({error: 'User not found'});
+    const result = db.exec(`SELECT * FROM users WHERE username = ?`, [username]);
+    if (!result.length) return res.status(401).json({error: "User not found"});
 
-    const ok = await bcrypt.compare(password, user.values[0][2]);
-    if (!ok) return res.status(401).json({error: 'Wrong password'});
+    const user = result[0].values[0];
+    const ok = await bcrypt.compare(password, user[2]);
+    if (!ok) return res.status(401).json({error: "Wrong password"});
 
     const token = jwt.sign({username}, JWT_SECRET, {expiresIn: '7d'});
-    res.json({token, user: {username: user.values[0][1], points: user.values[0][3]}});
-  } catch (e) {
-    res.status(500).json({error: 'Server error'});
+    res.json({token, user: {username: user[1], points: user[3]}});
+  } catch {
+    res.status(500).json({error: "Server error"});
   }
 });

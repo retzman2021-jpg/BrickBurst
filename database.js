@@ -7,15 +7,13 @@ let db;
 
 async function initDB() {
   const SQL = await initSqlJs();
-  // Load existing DB or create new
   if (fs.existsSync(dbPath)) {
-    const fileBuffer = fs.readFileSync(dbPath);
-    db = new SQL.Database(fileBuffer);
+    const buf = fs.readFileSync(dbPath);
+    db = new SQL.Database(buf);
   } else {
     db = new SQL.Database();
   }
 
-  // Create users table
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -25,13 +23,12 @@ async function initDB() {
   )`);
 
   saveDB();
-  console.log('✅ Database ready');
+  console.log("✅ Database ready");
 }
 
 function saveDB() {
   const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(dbPath, buffer);
+  fs.writeFileSync(dbPath, Buffer.from(data));
 }
 
 module.exports = { initDB, db, saveDB };
