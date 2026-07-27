@@ -29,12 +29,12 @@ window.api=api;
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.add("hidden"));document.getElementById(id).classList.remove("hidden");window.scrollTo(0,0);}
 function showAuth(){
   const m = document.getElementById("authModal");
-  if(m){ m.classList.remove("hidden"); m.style.display = "flex"; }
+  if(m){ if(m) m.classList.remove("hidden"); m.style.display = "flex"; }
   show("menuScreen");
 }
 function hideAuth(){
   const m = document.getElementById("authModal");
-  if(m){ m.classList.add("hidden"); m.style.display = "none"; }
+  if(m){ if(m) m.classList.add("hidden"); m.style.display = "none"; }
 }
 const $=id=>document.getElementById(id);
 
