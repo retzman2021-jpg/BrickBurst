@@ -31,6 +31,13 @@ function showAuth(){const m=document.getElementById("authModal");m.classList.rem
 function hideAuth(){const m=document.getElementById("authModal");m.classList.add("hidden");m.style.display="none";}
 const $=id=>document.getElementById(id);
 
+// ✅ NEW: Clean tab switch for original design
+function switchTab(name){
+  document.querySelectorAll(".tab-pane").forEach(p=>p.classList.add("hidden"));
+  document.getElementById("tab-"+name).classList.remove("hidden");
+}
+window.switchTab=switchTab;
+
 // Globals safety
 window.startClassic=startClassic;window.startAdventure=startAdventure;window.moreGames=moreGames;
 window.restartGame=restartGame;window.backToMenu=backToMenu;window.doLogin=doLogin;window.doRegister=doRegister;
@@ -78,17 +85,12 @@ document.addEventListener("DOMContentLoaded",()=>{
     const f=e.target.files[0];if(!f)return;const r=new FileReader();
     r.onload=()=>window[id+"_b64"]=r.result;r.readAsDataURL(f);
   }));
-  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
-    document.querySelectorAll(".tab-pane").forEach(x=>x.classList.add("hidden"));
-    t.classList.add("active");$("tab-"+t.dataset.tab).classList.remove("hidden");
-  });
   const m=$("wdMethod"),p=$("paypalField"),a=$("wdAccount");
   if(m&&p&&a)m.addEventListener("change",()=>{
     const pp=m.value==="paypal";p.classList.toggle("hidden",!pp);
     a.placeholder=pp?"(see PayPal field)":"09XXXXXXXXX / account no.";
   });
-  // ✅ Login on Enter key (no need to click button)
+  // ✅ Login on Enter key
   ["loginUser","loginPass"].forEach(id=>$(id)?.addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();}));
   ["regUser","regEmail","regPhone","regBday","regPass","regConfirm"].forEach(id=>$(id)?.addEventListener("keydown",e=>{if(e.key==="Enter")doRegister();}));
   boot();
@@ -109,13 +111,12 @@ async function refreshHud(){
 window.refreshHud=refreshHud;window.refreshUserData=refreshHud;
 
 // ==================================================
-// ✅ LOGIN — INSTANT, NO DELAY, BONUS SHOWN + ADDED
+// ✅ LOGIN — INSTANT, NO DELAY, BONUS SHOWN
 // ==================================================
 async function doLogin(){
-  // ✅ Anti-double-click lock
   if(_loginLock)return;_loginLock=true;
-  const btn=document.querySelector("#tab-login .btn-login");
-  const origText=btn?.innerText||"🔐 Login";
+  const btn=document.querySelector("#tab-login .btn-blue")||document.querySelector(".btn-login");
+  const origText=btn?.innerText||"Login";
   if(btn){btn.disabled=true;btn.style.opacity="0.6";btn.innerText="⏳ Logging in…";}
 
   try{
@@ -133,10 +134,7 @@ async function doLogin(){
 
     if(isAdmin){loadAdmin();return;}
 
-    // ✅ FORCE REFRESH so server's new points (with daily bonus) appear
     const fresh=await refreshHud();
-
-    // ✅ Show bonus message ONLY if server actually gave one
     if(r.dailyBonusGiven||r.bonusAdded){
       const bonus=r.bonusAdded||100;
       const newPts=Number(fresh?.points||currentUser?.points||0).toLocaleString();
@@ -152,7 +150,7 @@ async function doLogin(){
 }
 
 // ==================================================
-// ✅ REGISTER — +₱300 WELCOME BONUS AUTO-ADDED + SHOWN
+// ✅ REGISTER — +300 WELCOME BONUS AUTO-ADDED
 // ==================================================
 async function doRegister(){
   const b={
@@ -179,10 +177,7 @@ async function doRegister(){
   currentUser=r.user;
   hideAuth();
 
-  // ✅ FORCE REFRESH to pull welcome bonus points from server
   const fresh=await refreshHud();
-
-  // ✅ Show welcome bonus clearly
   const bonus=r.welcomeBonus||r.bonusAdded||300;
   const newPts=Number(fresh?.points||currentUser?.points||0).toLocaleString();
   alert(
@@ -262,7 +257,7 @@ async function doWithdraw(){
 }
 
 // ==================================================
-// KYC
+// ✅ KYC — AUTO-SCROLL TO ALL MISSING FIELDS
 // ==================================================
 function openKYC(){
   if(!authToken)return alert("Login first");
@@ -280,58 +275,31 @@ function openKYC(){
 function closeKyc(){$("kycModal").classList.add("hidden");}
 
 async function submitKyc(){
-  // 🔴 FIELD #1: FULL NAME — ALWAYS SCROLLS TO TOP
   const name=$("kFull").value.trim().toUpperCase();
   if(!name){
     alert("❌ KYC NOT READY!\n\n👉 FULL NAME is the VERY FIRST FIELD at the TOP of this window.\nIt has a THICK RED BORDER labeled ⚠️ 1. FULL NAME.\n\nScroll UP to fill it in first.");
     $("kFull").focus();
-    // ✅ FORCE SCROLL TO TOP + CENTER THE FIELD
-    $("kycModal").scrollTop = 0;
-    $("kFull").scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    $("kycModal").scrollTop=0;
+    $("kFull").scrollIntoView({behavior:"smooth",block:"center"});
     return;
   }
   if(name.split(" ").filter(w=>w.length>1).length<2)return alert("❌ Enter FULL NAME: First + Last (e.g. JUAN DELA CRUZ)");
+  const bday=$("kBday").value;if(!bday)return alert("❌ 2. Enter Date of Birth");
+  if(Math.floor((Date.now()-new Date(bday))/31557600000)<18)return alert("❌ Must be 18+");
+  const phone=$("kPhone").value.trim();if(!/^09\d{9}$/.test(phone))return alert("❌ 3. Enter valid PH mobile (09XXXXXXXXX)");
+  const addr=$("kAddr").value.trim();if(!addr||addr.length<5)return alert("❌ 4. Enter Complete Address");
+  const city=$("kCity").value.trim();if(!city)return alert("❌ 5. Enter City");
+  const prov=$("kProv").value.trim();if(!prov)return alert("❌ 6. Enter Province");
+  const idType=$("kIdType").value;if(!idType)return alert("❌ 9. Select Valid Government ID");
+  const idNum=$("kIdNum").value.trim();if(!idNum)return alert("❌ 10. Enter ID Number");
+  const src=$("kSource").value;if(!src)return alert("❌ 11. Select Source of Funds");
+  if(!window.kFront_b64)return alert("📸 12. Upload FRONT photo of your ID");
+  if(!$("kConsent").checked)return alert("✅ Tick consent checkbox at the bottom");
 
-  const bday=$("kBday").value;
-  if(!bday){
-    alert("❌ 2. Enter Date of Birth");
-    $("kBday").focus();
-    $("kBday").scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
-  }
-  const age=Math.floor((Date.now()-new Date(bday))/31557600000);
-  if(age<18)return alert("❌ Must be 18 years old or older");
-
-  const phone=$("kPhone").value.trim();
-  if(!/^09\d{9}$/.test(phone)){
-    alert("❌ 3. Enter valid PH mobile (09XXXXXXXXX)");
-    $("kPhone").focus();
-    $("kPhone").scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
-  }
-
-  const addr=$("kAddr").value.trim();
-  if(!addr||addr.length<5){
-    alert("❌ 4. Enter Complete Address");
-    $("kAddr").focus();
-    $("kAddr").scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
-  }
-  const city=$("kCity").value.trim();if(!city){alert("❌ 5. Enter City");$("kCity").focus();$("kCity").scrollIntoView({behavior:"smooth",block:"center"});return;}
-  const prov=$("kProv").value.trim();if(!prov){alert("❌ 6. Enter Province");$("kProv").focus();$("kProv").scrollIntoView({behavior:"smooth",block:"center"});return;}
-
-  const idType=$("kIdType").value;if(!idType){alert("❌ 9. Select Valid Government ID");$("kIdType").focus();$("kIdType").scrollIntoView({behavior:"smooth",block:"center"});return;}
-  const idNum=$("kIdNum").value.trim();if(!idNum){alert("❌ 10. Enter ID Number");$("kIdNum").focus();$("kIdNum").scrollIntoView({behavior:"smooth",block:"center"});return;}
-  const src=$("kSource").value;if(!src){alert("❌ 11. Select Source of Funds");$("kSource").focus();$("kSource").scrollIntoView({behavior:"smooth",block:"center"});return;}
-  if(!window.kFront_b64){alert("📸 12. Upload FRONT photo of your ID");return;}
-  if(!$("kConsent").checked){alert("✅ Tick the consent checkbox at the bottom");return;}
-
-  const b={
-    fullName:name,birthday:bday,phone,address:addr,city,province,
+  const b={fullName:name,birthday:bday,phone,address:addr,city,province,
     zip:$("kZip").value.trim(),occupation:$("kOcc").value.trim(),
     idType,idNumber:idNum,sourceOfFunds:src,
-    idFront:window.kFront_b64||"",idBack:window.kBack_b64||"",selfie:window.kSelfie_b64||""
-  };
+    idFront:window.kFront_b64||"",idBack:window.kBack_b64||"",selfie:window.kSelfie_b64||""};
   const r=await api("/kyc/submit","POST",b);if(!r.ok)return;
   alert(r.message||"✅ KYC Submitted!\nReview within 24 hours.");
   closeKyc();showMenuBanner();
@@ -389,9 +357,9 @@ async function adminFreeze(u,f){
     "doLogin","doRegister","logout","watchAd","openKYC","closeKyc","submitKyc",
     "openProfile","closeProfile","openConvert","closeConvert","doConvert",
     "openWithdraw","closeWithdraw","doWithdraw","openSettings","closeSettings","saveSettings",
-    "openAdminLogin","closeAdminLogin","adminLogin","adminLogout","adminKyc","adminFreeze"];
+    "openAdminLogin","closeAdminLogin","adminLogin","adminLogout","adminKyc","adminFreeze","switchTab"];
   required.forEach(fn=>{if(typeof window[fn]!=="function")window[fn]=()=>alert(`⏳ ${fn} — refresh (F5)`);});
-  console.log("✅ BrickBurst app.js v5 ready (instant login + bonuses fixed)");
+  console.log("✅ BrickBurst app.js v6 ready (clean design + instant login + bonuses)");
 })();
 
 // ==================================================
@@ -408,4 +376,3 @@ function boot(){
     }).catch(clearAuth);
   }else showAuth();
 }
-// ✅ END app.js v5 — login instant + register +₱300 + daily +₱100 BONUSES WORK

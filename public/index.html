@@ -10,59 +10,63 @@
 </head>
 <body>
 
-<!-- ===== AUTH TABS ===== -->
-<div class="auth-tabs">
-  <button class="tab active" data-tab="login">🔐 LOGIN</button>
-  <button class="tab" data-tab="register">📝 REGISTER</button>
-</div>
+<!-- ===== AUTH FORM BOX (MATCHES YOUR THIRD IMAGE) ===== -->
+<div class="auth-box">
+  <h1 class="brand">
+    <span style="color:#f97316">B</span>
+    <span style="color:#3b82f6">L</span>
+    <span style="color:#ef4444">O</span>
+    <span style="color:#eab308">C</span>
+    <span style="color:#8b5cf6">K</span>
+    <br>
+    <span style="color:#22d3ee">B</span>
+    <span style="color:#22d3ee">L</span>
+    <span style="color:#22d3ee">A</span>
+    <span style="color:#22d3ee">S</span>
+    <span style="color:#22d3ee">T</span>
+  </h1>
+  <p class="sub">ADVENTURE MASTER</p>
 
-<!-- ===== LOGIN FORM ===== -->
-<div id="tab-login" class="tab-pane">
-  <div class="form-group">
-    <label>Username</label>
-    <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
+  <!-- ===== LOGIN FORM ===== -->
+  <div id="tab-login" class="tab-pane">
+    <div class="form-group">
+      <input type="text" id="loginUser" placeholder="Username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="btn btn-blue" onclick="doLogin()">Login</button>
+    <button class="btn btn-green" onclick="switchTab('register')">Register</button>
   </div>
-  <div class="form-group">
-    <label>Password</label>
-    <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
-  </div>
-  <!-- ✅ ONLY ONE WORKING LOGIN BUTTON -->
-  <button class="btn btn-primary btn-login" onclick="doLogin()">🔐 LOGIN NOW</button>
-  <p class="hint">Press Enter key to submit</p>
-</div>
 
-<!-- ===== REGISTER FORM ===== -->
-<div id="tab-register" class="tab-pane hidden">
-  <div class="form-group">
-    <label>Username</label>
-    <input type="text" id="regUser" placeholder="Min 3 characters">
+  <!-- ===== REGISTER FORM ===== -->
+  <div id="tab-register" class="tab-pane hidden">
+    <div class="form-group">
+      <input type="text" id="regUser" placeholder="Username" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <input type="email" id="regEmail" placeholder="Email">
+    </div>
+    <div class="form-group">
+      <input type="tel" id="regPhone" placeholder="Mobile Number (09XXXXXXXXX)" maxlength="11">
+    </div>
+    <div class="form-group">
+      <input type="date" id="regBday">
+    </div>
+    <div class="form-group">
+      <input type="password" id="regPass" placeholder="Password (min 8 chars)">
+      <div id="passStrength" class="strength"></div>
+    </div>
+    <div class="form-group">
+      <input type="password" id="regConfirm" placeholder="Confirm Password">
+    </div>
+    <div class="form-group checkbox">
+      <input type="checkbox" id="regTerms">
+      <label for="regTerms">I agree to Terms, Privacy & AML Policy</label>
+    </div>
+    <button class="btn btn-green" onclick="doRegister()">Create Account</button>
+    <button class="btn btn-blue" onclick="switchTab('login')">Back to Login</button>
   </div>
-  <div class="form-group">
-    <label>Email</label>
-    <input type="email" id="regEmail" placeholder="your@email.com">
-  </div>
-  <div class="form-group">
-    <label>Mobile Number</label>
-    <input type="tel" id="regPhone" placeholder="09XXXXXXXXX" maxlength="11">
-  </div>
-  <div class="form-group">
-    <label>Birthday</label>
-    <input type="date" id="regBday">
-  </div>
-  <div class="form-group">
-    <label>Password</label>
-    <input type="password" id="regPass" placeholder="Min 8 characters">
-    <div id="passStrength" class="strength"></div>
-  </div>
-  <div class="form-group">
-    <label>Confirm Password</label>
-    <input type="password" id="regConfirm" placeholder="Re-type password">
-  </div>
-  <div class="form-group checkbox">
-    <input type="checkbox" id="regTerms">
-    <label for="regTerms">I agree to Terms, Privacy & AML Policy</label>
-  </div>
-  <button class="btn btn-primary" onclick="doRegister()">📝 CREATE ACCOUNT</button>
 </div>
 
 <!-- ADMIN LOGIN -->
